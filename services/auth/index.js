@@ -4,15 +4,21 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     register: async (req) => {
-        const { username, email, password } = req.body;
+        const { userName, email, password } = req.body;
         try {
-            const existing = await User.findOne({ email });
+            const normalizedUserName = userName.toLowerCase().replace(/\s+/g, '')
+            const existing = await User.findOne({
+                $or: [{ email }, { userName: normalizedUserName }]
+            });
             if (existing) {
-                return { success: false, message: 'User already exists', statusCode: 400 };
+                const message = (existing.email == email)
+                    ? 'User already exists'
+                    : 'Username already taken';
+                return { success: false, message, statusCode: 400 };
             }
 
             const hashed = await bcrypt.hash(password, 10);
-            const user = new User({ username, email, password: hashed });
+            const user = new User({ userName: normalizedUserName, email, password: hashed });
             await user.save();
 
             return {

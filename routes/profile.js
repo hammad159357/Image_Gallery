@@ -3,6 +3,6 @@ const userController = require("../controllers/user");
 
 
 //  public profile route
-router.get("/:id", userController.getUserProfile);
+router.get("/:userName", userController.getUserProfile);
 
 module.exports = router;

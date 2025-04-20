@@ -3,9 +3,13 @@ const mongoose = require('mongoose');
 const imageSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true,
     },
-    imageUrl: String,
+    imageUrl: {
+        type: String,
+        required: true,
+    },
     title: String,
     description: String,
     isPublic: {

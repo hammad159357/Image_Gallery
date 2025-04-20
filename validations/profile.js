@@ -14,7 +14,22 @@ module.exports = {
     },
     validateProfile: function (obj) {
         const schema = Joi.object({
-            userName: Joi.string().min(3).max(30).optional(),
+            userName: Joi.string()
+                .trim()
+                .lowercase()
+                .pattern(/^\S+$/)
+                .min(3)
+                .max(30)
+                .optional()
+                .label("User Name")
+                .messages({
+                    'string.pattern.base': 'Username cannot contain spaces',
+                    "string.base": `"User Name" should be a type of text`,
+                    "string.empty": `"User Name" cannot be empty`,
+                    "string.min": `"User Name" should have at least {#limit} characters`,
+                    "string.max": `"User Name" should have at most {#limit} characters`,
+                    "any.required": `"User Name" is required`,
+                }),
             imageId: Joi.string()
                 .optional()
                 .custom((value, helpers) => {

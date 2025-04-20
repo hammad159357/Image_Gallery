@@ -4,11 +4,15 @@ module.exports = {
     validateRegister: function (obj) {
         const schema = Joi.object({
             userName: Joi.string()
+                .trim()
+                .lowercase()
+                .pattern(/^\S+$/)
                 .min(3)
                 .max(30)
                 .required()
                 .label("User Name")
                 .messages({
+                    'string.pattern.base': 'Username cannot contain spaces',
                     "string.base": `"User Name" should be a type of text`,
                     "string.empty": `"User Name" cannot be empty`,
                     "string.min": `"User Name" should have at least {#limit} characters`,

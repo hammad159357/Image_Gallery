@@ -84,10 +84,22 @@ module.exports = {
             if (!user) {
                 return { success: false, message: 'User not found', statusCode: 404 };
             }
-            if (userName) {
-                user.userName = userName;
+            if (userName && userName !== user.userName) {
+                const normalizedUserName = userName.toLowerCase().replace(/\s+/g, '')
+                const existingUser = await User.findOne({
+                    userName: normalizedUserName
+                });
+
+                if (existingUser && existingUser._id.toString() !== id) {
+                    return {
+                        success: false,
+                        message: 'Username already taken',
+                        statusCode: 409
+                    };
+                }
+                user.userName = normalizedUserName;
+                await user.save();
             }
-            await user.save();
             if (imageId) {
                 const image = await Image.findByIdAndUpdate(imageId, {
                     isPublic: isPublic === true || isPublic === 'true',
@@ -197,13 +209,13 @@ module.exports = {
     },
     getUserProfile: async (req) => {
         const { params } = req;
-        const { id } = params;
+        const { userName } = params;
 
         try {
             const [data] = await User.aggregate([
                 {
                     $match: {
-                        _id: new mongoose.Types.ObjectId(id),
+                        userName: userName.toLowerCase()
                     }
                 },
                 {
